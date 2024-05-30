@@ -3,7 +3,8 @@ const express     = require('express');
 const bodyParser  = require('body-parser');
 const expect      = require('chai').expect;
 const cors        = require('cors');
-
+const helmet = require('helmet');
+const mongoose = require('mongoose');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const apiRoutes         = require('./routes/api.js');
 const runner            = require('./test-runner');
@@ -13,8 +14,14 @@ const app = express();
 app.use('/public', express.static(process.cwd() + '/public'));
 app.use(cors({origin: '*'})); //For FCC testing purposes only
 
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Failed to connect to MongoDB', err));
 
 //Index page (static HTML)
 app.route('/')
